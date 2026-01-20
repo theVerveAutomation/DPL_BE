@@ -15,7 +15,10 @@ const API = {
   RUN_TASK: 3106,
   EStop: 6004,
   MAP_LIST_REQ: 1300,
-  PULL_MAP_REQ: 4011
+  PULL_MAP_REQ: 4011,
+  SEIZE_CONTROL: 4005,
+  RELOCATION: 2002,
+  CONFIRM_LOC: 2003
 };
 
 async function moveOpenLoop({ vx = 0, vy = 0, w = 0, duration = 2000 }) {
@@ -34,6 +37,7 @@ async function RunTask(taskName) {
 
 async function Estop(Estop) {
   const body = {"status": Estop}
+  console.log("EStop Body:", body)
   const res = await otherClient.sendRequest(API.EStop, body, 3000);
   return res.json || res;
 }
@@ -73,5 +77,54 @@ async function pullMap(mapName = "default") {
   return res.json || res;
 }
 
+async function seizeControl() {
+  console.log("⚠️ Seizing robot control...");
 
-module.exports = { moveOpenLoop, stopMotion, getBattery, getLocation, getNavStatus, RunTask, Estop, getMapList, pullMap};
+  const body = {
+    nick_name: "DPLComputer"
+  };
+
+  const res = await ConfigurationClient.sendRequest(
+    API.SEIZE_CONTROL, // Preempt / Seize control API
+    body,
+    3000
+  );
+
+  console.log("Seize Control Response:", res);
+  return res.json || res;
+}
+
+
+async function relocate({ x, y, angle }) {
+  const body = {
+    x: Number(x),
+    y: Number(y),
+    angle: Number(angle)
+  };
+
+  console.log("📍 Relocation Body:", body);
+
+  const res = await controlClient.sendRequest(
+    API.RELOCATION,
+    body,
+    5000
+  );
+
+  return res.json || res;
+}
+
+/* ===============================
+   CONFIRM LOCATION
+================================ */
+async function confirmLocation() {
+  const res = await controlClient.sendRequest(
+    API.CONFIRM_LOC,
+    null,
+    3000
+  );
+
+  return res.json || res;
+}
+
+
+module.exports = { moveOpenLoop, stopMotion, getBattery, getLocation, getNavStatus, RunTask, Estop, getMapList, pullMap, seizeControl, relocate, confirmLocation};
