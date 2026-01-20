@@ -59,16 +59,93 @@ async function RunTask(req, res) {
 }
 
 async function Estop(req, res) {
-  try{
-    const Estop = req.body;
-    const r = await robotService.Estop({Estop})
-    return res.json({ ok: true, result: r });
-  }
-  catch (err) {
-    console.error("postMove error", err);
+  try {
+    const { status } = req.body;   // 👈 extract directly
+
+    console.log("E-Stop Request Body:", status);
+
+    const result = await robotService.Estop(status);
+
+    return res.json({ ok: true, result });
+
+  } catch (err) {
+    console.error("Estop controller error", err);
     return res.status(500).json({ ok: false, error: err.message });
   }
 }
 
+async function seizeControl(req, res) {
+  try {
+    const result = await robotService.seizeControl();
 
-module.exports = { postMove, postStop, getBattery, getLocation, getNavStatus, RunTask, Estop};
+    res.status(200).json({
+      success: true,
+      message: "Robot control seized successfully",
+      data: result
+    });
+  } catch (error) {
+    console.error("Seize Control Error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to seize robot control",
+      error: error.message
+    });
+  }
+};
+
+/* ===============================
+   RELOCATE
+================================ */
+async function relocate(req, res){
+  try {
+    const { x, y, angle } = req.body;
+
+    if (x === undefined || y === undefined || angle === undefined) {
+      return res.status(400).json({
+        success: false,
+        message: "x, y, angle are required"
+      });
+    }
+
+    const result = await robotService.relocate({ x, y, angle });
+
+    res.status(200).json({
+      success: true,
+      message: "Relocation command sent",
+      data: result
+    });
+  } catch (error) {
+    console.error("Relocate Error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Relocation failed",
+      error: error.message
+    });
+  }
+};
+
+/* ===============================
+   CONFIRM LOCATION
+================================ */
+async function confirmLocation(req,res){
+  try {
+    const result = await robotService.confirmLocation();
+
+    res.status(200).json({
+      success: true,
+      message: "Location confirmed",
+      data: result
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Confirm location failed",
+      error: error.message
+    });
+  }
+};
+
+
+module.exports = { postMove, postStop, getBattery, getLocation, getNavStatus, RunTask, Estop, seizeControl,relocate,confirmLocation };

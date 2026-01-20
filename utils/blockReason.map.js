@@ -1,0 +1,11 @@
+exports.BLOCK_REASON_MAP = {
+  0: "ULTRASONIC",
+  1: "LASER",
+  2: "FALLING_DOWN",
+  3: "COLLISION",
+  4: "INFRARED",
+  5: "LOCK",
+  6: "DYNAMIC_OBSTACLE",
+  7: "VIRTUAL_LASER",
+  8: "3D_CAMERA"
+};

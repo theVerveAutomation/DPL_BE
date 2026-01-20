@@ -15,6 +15,7 @@ app.use(cors());
 app.use("/api/auth", require("./routes/adminRoutes"));
 app.use('/api/baseip', require("./routes/base_IPRoutes"));
 app.use('/api/robot', require("./routes/index"));
+app.use('/api/map', require("./routes/map.routes"));
 
 // Create a single HTTP server to handle both Express and WebSockets
 const server = http.createServer(app);
