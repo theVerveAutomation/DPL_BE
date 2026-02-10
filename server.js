@@ -9,7 +9,25 @@ const startWSServer = require('./wsServer');
 
 // Middleware
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: (origin, callback) => {
+    const allowedOrigins = [
+      'http://localhost:3001',
+      'http://192.168.1.35:3004'
+    ];
+
+    // allow requests with no origin (Postman, curl)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS not allowed'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  credentials: true
+}));
 
 // Routes
 app.use("/api/auth", require("./routes/adminRoutes"));
@@ -24,7 +42,7 @@ const server = http.createServer(app);
 const wss = startWSServer(server);
 
 // Start the one and only server
-server.listen(config.server.port, () => {
+server.listen(config.server.port, '0.0.0.0' , () => {
   const port = config.server.port;
   console.log(`Backend listening on port ${port}`);
   console.log(`Server running on port ${port}`);
