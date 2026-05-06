@@ -18,7 +18,8 @@ async function getMapList() {
 
 async function getMapGrid(map_name) {
   if (!map_name) throw new Error("map_name is required");
-  const res = await ConfigurationClient.sendRequest(API.MAP_GRID_REQ, {
+  console.log("map:", map_name)
+  const res = await ConfigurationClient.sendRequest(API.PULL_MAP_REQ, {
     map_name
   });
   return res.json || res;

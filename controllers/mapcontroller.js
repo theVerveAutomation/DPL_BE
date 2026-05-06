@@ -1,11 +1,11 @@
-const robotTcp = require("../services/map.services");
+const mapService = require("../services/map.services");
 
 /**
  * GET /api/map/list
  */
 exports.getMapList = async (req, res) => {
   try {
-    const data = await robotTcp.getMapList();
+    const data = await mapService.getMapList();
     res.json(data);
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });
@@ -17,9 +17,8 @@ exports.getMapList = async (req, res) => {
  */
 exports.getMapGrid = async (req, res) => {
   try {
-    const data = await robotTcp.send(19205, 2102, {
-      map_name: req.params.map,
-    });
+    const map_name = req.params.map
+    const data = await mapService.getMapGrid(map_name)
     res.json(data);
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });
@@ -31,7 +30,7 @@ exports.getMapGrid = async (req, res) => {
  */
 exports.getStations = async (req, res) => {
   try {
-    const data = await robotTcp.send(19206, 3050, {
+    const data = await mapService.send(19206, 3050, {
       map_name: req.params.map,
     });
     res.json(data);
@@ -48,7 +47,7 @@ exports.pullMap = async (req, res) => {
       return res.status(400).json({ error: "map_name required" });
     }
 
-    const data = await robotTcp.pullMap(map_name);
+    const data = await mapService.pullMap(map_name);
     res.json(data);
   } catch (err) {
     res.status(500).json({ error: err.message });
